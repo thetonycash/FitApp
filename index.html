@@ -1,390 +1,2052 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="AeroFit">
-  <title>AeroFit • Smart Training</title>
+  <meta name="apple-mobile-web-app-title" content="AeroFit Pro">
+  <meta name="theme-color" content="#07090e">
+  <title>AeroFit Pro - Master Cindy Split & Custom Program Builder</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#07090e',
+            cardbg: '#111522',
+            cardelevated: '#171c2c',
+            cardborder: 'rgba(255, 255, 255, 0.08)',
+            neonCyan: '#00d2ff',
+            neonEmerald: '#00f5a0',
+            neonCoral: '#ff416c',
+            neonGold: '#f7971e',
+            neonPurple: '#a855f7'
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
     :root {
-      --bg: #0b0c10;
-      --card: #151821;
-      --card-inner: #1c202d;
-      --border: #262c3d;
-      --accent: #3b82f6;
-      --green: #10b981;
-      --yellow: #f59e0b;
-      --red: #ef4444;
-      --text: #f3f4f6;
-      --muted: #9ca3af;
+      --sat: env(safe-area-inset-top, 0px);
+      --sab: env(safe-area-inset-bottom, 0px);
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    
+    * {
+      -webkit-tap-highlight-color: transparent;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    input, textarea, select {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      padding: env(safe-area-inset-top, 24px) 16px env(safe-area-inset-bottom, 80px) 16px;
+      background-color: #07090e;
+      color: #f3f4f6;
+      padding-top: max(var(--sat), 12px);
+      padding-bottom: calc(var(--sab) + 84px);
       min-height: 100vh;
-    }
-    header { padding: 8px 0 16px; display: flex; justify-content: space-between; align-items: center; }
-    h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-
-    /* ATHLYTIC READINESS CARD */
-    .athlytic-card {
-      background: linear-gradient(145deg, #131722, #1a2030);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    }
-    .athlytic-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .athlytic-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-    .readiness-badge {
-      font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
-      text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .badge-green { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
-    .badge-yellow { background: rgba(245, 158, 11, 0.2); color: var(--yellow); border: 1px solid var(--yellow); }
-    .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--red); border: 1px solid var(--red); }
-
-    .metrics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-    .metric-box { background: var(--card-inner); border-radius: 12px; padding: 10px 12px; text-align: center; }
-    .metric-box label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-    .metric-value { font-size: 22px; font-weight: 800; }
-    .metric-slider { width: 100%; margin-top: 6px; accent-color: var(--accent); }
-
-    .guidance-box {
-      background: rgba(0,0,0,0.25); border-left: 3px solid var(--accent);
-      padding: 10px 12px; border-radius: 6px; font-size: 12px; line-height: 1.45;
+      overflow-x: hidden;
     }
 
-    /* NAVIGATION TABS */
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab-btn {
-      flex: 1; min-width: 85px; padding: 10px 8px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--card); color: var(--muted); font-size: 12px; font-weight: 700; text-align: center;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-    .workout-view { display: none; }
-    .workout-view.active { display: block; }
-
-    /* WORKOUT CARDS */
-    .card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 16px; margin-bottom: 14px;
-    }
-    .exercise-title { font-size: 16px; font-weight: 700; }
-    .exercise-subtitle { font-size: 12px; color: var(--muted); margin: 3px 0 10px; }
-    .load-suggestion {
-      display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 8px;
-      border-radius: 6px; background: var(--card-inner); color: var(--accent); margin-bottom: 10px;
+    .glass-card {
+      background: rgba(17, 21, 34, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .set-row {
-      display: grid; grid-template-columns: 32px 1fr 1fr 40px; gap: 8px;
-      align-items: center; margin-bottom: 8px;
+    .glass-card-elevated {
+      background: rgba(23, 28, 44, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.7);
     }
-    .set-label { font-size: 12px; color: var(--muted); font-weight: 700; text-align: center; }
-    input[type="number"], input[type="text"] {
-      width: 100%; background: var(--card-inner); border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px; color: #fff; font-size: 14px; text-align: center;
-    }
-    input:focus { outline: none; border-color: var(--accent); }
-    .check-btn {
-      height: 40px; border-radius: 8px; border: 1px solid var(--border);
-      background: var(--card-inner); color: var(--muted); display: flex; align-items: center;
-      justify-content: center; cursor: pointer; font-size: 16px;
-    }
-    .check-btn.done { background: var(--green); border-color: var(--green); color: #fff; }
 
-    .cindy-box { text-align: center; padding: 24px 0 16px; }
-    .cindy-rounds { font-size: 64px; font-weight: 900; color: var(--green); line-height: 1; }
-    .cindy-btn-row { display: flex; gap: 10px; margin-top: 16px; }
-    .cindy-btn {
-      padding: 14px; border-radius: 10px; border: none; font-size: 16px; font-weight: 700;
-      cursor: pointer; flex: 1;
-    }
-    .btn-add { background: var(--green); color: #000; flex: 2; }
-    .btn-sub { background: var(--card-inner); color: var(--text); }
+    .grad-cyan { background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); }
+    .grad-emerald { background: linear-gradient(135deg, #00f5a0 0%, #00d9f5 100%); }
+    .grad-coral { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); }
+    .grad-gold { background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%); }
+    .grad-purple { background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); }
 
-    .action-btn {
-      width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 12px;
-      color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 12px;
+    .glow-cyan { box-shadow: 0 0 28px -4px rgba(0, 210, 255, 0.35); }
+    .glow-emerald { box-shadow: 0 0 28px -4px rgba(0, 245, 160, 0.35); }
+    .glow-coral { box-shadow: 0 0 28px -4px rgba(255, 65, 108, 0.35); }
+
+    .tap-press {
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    .history-item { border-bottom: 1px solid var(--border); padding: 10px 0; font-size: 13px; }
+    .tap-press:active {
+      transform: scale(0.96);
+    }
+
+    .timer-ring {
+      transition: stroke-dashoffset 0.35s linear;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+
+    ::-webkit-scrollbar { display: none; }
   </style>
 </head>
-<body>
+<body class="font-sans antialiased text-slate-100 selection:bg-cyan-500 selection:text-black">
 
-  <header>
-    <h1>AeroFit</h1>
-    <span id="dateLabel" style="font-size: 13px; color: var(--muted);"></span>
+  <!-- iOS Sticky App Header -->
+  <header class="sticky top-0 z-40 px-4 py-3 glass-card border-b border-white/5 flex items-center justify-between">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-8 h-8 rounded-xl grad-emerald flex items-center justify-center shadow-lg shadow-emerald-500/25">
+        <svg class="w-5 h-5 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M18 6L6 18M6 6l12 12"/>
+          <circle cx="12" cy="12" r="10" stroke-width="2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="flex items-center space-x-1.5">
+          <span class="text-base font-black tracking-tight text-white uppercase">AeroFit</span>
+          <span class="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">PRO</span>
+        </div>
+        <p id="activeProgramSubtitle" class="text-[11px] font-medium text-slate-400 -mt-0.5 truncate max-w-[170px]">Cindy Master Split</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center space-x-2">
+      <!-- Quick Program Switcher Button -->
+      <button onclick="openProgramSwitcherModal()" class="px-2.5 py-1 text-xs font-bold rounded-xl glass-card text-slate-200 border border-white/10 hover:border-cyan-500/40 tap-press flex items-center space-x-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="navProgramTag">Programs</span>
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+
+      <!-- Audio Toggle / Sound Check -->
+      <button onclick="testAudioTone()" title="Web Audio Active" class="w-8 h-8 rounded-xl glass-card flex items-center justify-center text-cyan-400 tap-press border border-white/10">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+      </button>
+    </div>
   </header>
 
-  <!-- ATHLYTIC DAILY RECOVERY WIDGET -->
-  <section class="athlytic-card">
-    <div class="athlytic-header">
-      <span class="athlytic-title">Athlytic Readiness</span>
-      <span id="statusBadge" class="readiness-badge badge-green">Prime to Push</span>
-    </div>
+  <main class="max-w-md mx-auto px-4 pt-3 pb-4">
 
-    <div class="metrics-row">
-      <div class="metric-box">
-        <label>Recovery</label>
-        <div id="recoveryDisplay" class="metric-value" style="color: var(--green);">85%</div>
-        <input type="range" id="recoveryInput" class="metric-slider" min="0" max="100" value="85" oninput="updateReadiness()">
+    <!-- ========================================================================= -->
+    <!-- VIEW 1: TODAY WORKOUT VIEW (Dynamic for Active Program)                    -->
+    <!-- ========================================================================= -->
+    <section id="view-today" class="space-y-4">
+
+      <!-- Active Program Header Banner -->
+      <div class="glass-card-elevated rounded-3xl p-4 relative overflow-hidden border border-white/10">
+        <div class="absolute -right-8 -bottom-8 w-28 h-28 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active Program</span>
+            <span id="activeProgramDaysCount" class="text-xs text-slate-400">5 Days/Week</span>
+          </div>
+          <button onclick="openProgramSwitcherModal()" class="text-xs font-bold text-cyan-400 hover:text-cyan-300 tap-press">
+            Change Program →
+          </button>
+        </div>
+        <h2 id="currentProgramHeading" class="text-xl font-black text-white mt-1.5">Cindy Master Split</h2>
+        <p id="currentProgramDescription" class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+          Targeted pull-up volume & endurance, Peloton aerobic flush, and Friday Cindy 20-min AMRAP benchmark.
+        </p>
+
+        <!-- Pull-Up Milestone Focus Bar (Built into the Master Split) -->
+        <div id="pullUpGoalWidget" class="mt-3.5 pt-3 border-t border-white/5">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              Strict Pull-Up Mastery Focus
+            </span>
+            <span class="text-cyan-300 font-mono font-bold" id="pullUpRatioText">2 / 5 Clean Reps</span>
+          </div>
+          <div class="w-full bg-slate-900 rounded-full h-2 mt-1.5 overflow-hidden p-0.5 border border-white/10">
+            <div id="pullUpProgressBar" class="grad-cyan h-full rounded-full transition-all duration-500" style="width: 40%"></div>
+          </div>
+        </div>
       </div>
-      <div class="metric-box">
-        <label>Exertion (0–21)</label>
-        <div id="exertionDisplay" class="metric-value" style="color: var(--accent);">6.2</div>
-        <input type="range" id="exertionInput" class="metric-slider" min="0" max="21" step="0.1" value="6.2" oninput="updateReadiness()">
+
+      <!-- Day Horizontal Selector Bar -->
+      <div class="glass-card rounded-2xl p-2 flex items-center space-x-1.5 overflow-x-auto" id="programDaysTabs">
+        <!-- Dynamically populated days -->
+      </div>
+
+      <!-- Selected Day Content Panel -->
+      <div id="dayWorkoutContent" class="space-y-4">
+        <!-- Dynamically rendered exercises based on chosen day -->
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 2: PROGRAM MANAGER & BUILDER HUB                                     -->
+    <!-- ========================================================================= -->
+    <section id="view-programs" class="hidden space-y-4">
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-cyan-400">Routines & Splits</span>
+          <h2 class="text-xl font-black text-white">Program Manager</h2>
+        </div>
+        <button onclick="openCreateProgramModal()" class="px-3.5 py-2 rounded-xl grad-emerald text-black font-extrabold text-xs tap-press flex items-center space-x-1 shadow-lg shadow-emerald-500/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          <span>New Program</span>
+        </button>
+      </div>
+
+      <!-- List of Available Programs -->
+      <div id="programsListContainer" class="space-y-3">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- Pre-built Workout Templates Section -->
+      <div class="glass-card rounded-3xl p-4 border border-white/10 space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Featured AeroFit Routines</h3>
+        
+        <div class="grid grid-cols-1 gap-2.5">
+          <div class="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-between">
+            <div>
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs font-bold text-white">Upper/Lower + Cindy Protocol</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 font-bold">4 Days</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">Heavy bench/squat split with Friday Cindy AMRAP conditioning.</p>
+            </div>
+            <button onclick="clonePreset('upper-lower-cindy')" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold tap-press border border-white/10">
+              Duplicate
+            </button>
+          </div>
+
+          <div class="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-between">
+            <div>
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs font-bold text-white">Strict Pull-Up Hypertrophy Lab</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-bold">3 Days</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">Focus specifically on lat pull volume, tempo eccentric desents & scapular strength.</p>
+            </div>
+            <button onclick="clonePreset('pullup-hypertrophy')" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs font-bold tap-press border border-white/10">
+              Duplicate
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 3: CINDY BENCHMARK STATION (20-min AMRAP Engine)                     -->
+    <!-- ========================================================================= -->
+    <section id="view-cindy" class="hidden space-y-4">
+      
+      <!-- Top Title & Survival Strategy Guide -->
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Benchmark Station</span>
+          <h2 class="text-xl font-black text-white mt-1">Cindy 20-Min AMRAP</h2>
+        </div>
+        <button onclick="openStrategyModal()" class="px-2.5 py-1.5 rounded-xl glass-card text-xs font-bold text-slate-300 hover:text-white border border-white/10 tap-press flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/></svg>
+          Pacing Guide
+        </button>
+      </div>
+
+      <!-- Live Circular Countdown Dial -->
+      <div class="glass-card-elevated rounded-3xl p-6 text-center relative overflow-hidden glow-emerald">
+        
+        <div class="relative w-48 h-48 mx-auto flex items-center justify-center">
+          <svg class="w-full h-full" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="88" stroke="rgba(255,255,255,0.06)" stroke-width="12" fill="transparent" />
+            <circle id="cindyDialCircle" class="timer-ring" cx="100" cy="100" r="88" stroke="#00f5a0" stroke-width="12" stroke-linecap="round" fill="transparent" stroke-dasharray="552.92" stroke-dashoffset="0" />
+          </svg>
+          
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="cindyTimerDigits" class="text-4xl font-black font-mono tracking-tight text-white">20:00</span>
+            <span id="cindyStatusLabel" class="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mt-1">Ready</span>
+          </div>
+        </div>
+
+        <!-- Timer Controls -->
+        <div class="flex items-center justify-center gap-3 mt-5">
+          <button id="cindyToggleBtn" onclick="toggleCindyTimer()" class="px-8 py-3 rounded-2xl grad-emerald text-black font-black text-sm tap-press shadow-xl shadow-emerald-500/25 flex items-center gap-2">
+            <svg id="cindyPlayIcon" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span id="cindyPlayText">Start Cindy</span>
+          </button>
+          <button onclick="resetCindyTimer()" class="w-11 h-11 rounded-2xl glass-card text-slate-300 flex items-center justify-center tap-press border border-white/10 hover:text-white">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tactile Round Tap Counter -->
+      <div class="glass-card rounded-3xl p-5 text-center space-y-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Completed Rounds</span>
+          <div class="text-6xl font-black text-emerald-400 my-1 font-mono tracking-tighter" id="cindyRoundsBig">0</div>
+          <div class="text-xs text-slate-400">
+            5 Pull-ups • 10 Push-ups • 15 Air Squats (30 reps/rnd)
+          </div>
+        </div>
+
+        <!-- GIANT +1 BUTTON -->
+        <button onclick="incrementCindyRound(1)" class="w-full py-5 rounded-2xl grad-emerald text-black font-black text-xl tap-press shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          TAP +1 ROUND
+        </button>
+
+        <!-- Micro-Reps Selector -->
+        <div class="pt-2 border-t border-white/5 space-y-2">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide block">Partial Reps In Progress</span>
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="addCindyPartialReps(5)" class="py-2.5 rounded-xl bg-slate-900/80 text-slate-200 text-xs font-bold tap-press border border-white/10 hover:border-emerald-500/40">
+              +5 Pull
+            </button>
+            <button onclick="addCindyPartialReps(10)" class="py-2.5 rounded-xl bg-slate-900/80 text-slate-200 text-xs font-bold tap-press border border-white/10 hover:border-emerald-500/40">
+              +10 Push
+            </button>
+            <button onclick="addCindyPartialReps(15)" class="py-2.5 rounded-xl bg-slate-900/80 text-slate-200 text-xs font-bold tap-press border border-white/10 hover:border-emerald-500/40">
+              +15 Squat
+            </button>
+            <button onclick="incrementCindyRound(-1)" class="py-2.5 rounded-xl bg-slate-900 text-rose-400 text-xs font-bold tap-press border border-rose-500/20">
+              -1 Rnd
+            </button>
+          </div>
+          <div class="text-xs text-slate-300 font-mono">
+            Extra Reps: <span id="cindyPartialDisplay" class="font-bold text-emerald-400">0</span> / 30
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Pace & Metric Estimator -->
+      <div class="glass-card rounded-2xl p-4">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Live Pace Analysis</h4>
+        <div class="grid grid-cols-2 gap-3 text-center">
+          <div class="bg-black/40 rounded-xl p-3 border border-white/5">
+            <span class="text-[10px] text-slate-400 uppercase block">Current Pace</span>
+            <span id="cindyPaceMetric" class="text-base font-extrabold text-white font-mono">--:-- / rnd</span>
+          </div>
+          <div class="bg-black/40 rounded-xl p-3 border border-white/5">
+            <span class="text-[10px] text-slate-400 uppercase block">Projected 20m Score</span>
+            <span id="cindyProjectedScore" class="text-base font-extrabold text-emerald-400 font-mono">-- rounds</span>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveCindySession()" class="w-full py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold text-sm tap-press shadow-lg shadow-emerald-500/25">
+        Finish & Record Cindy WOD
+      </button>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 4: PROGRESSION ANALYTICS & PRs                                       -->
+    <!-- ========================================================================= -->
+    <section id="view-analytics" class="hidden space-y-4">
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-cyan-400">Trends & Telemetry</span>
+          <h2 class="text-xl font-black text-white">Performance Analytics</h2>
+        </div>
+        <span class="text-xs font-semibold text-slate-400">Lifetime History</span>
+      </div>
+
+      <!-- Cindy Progression Graph -->
+      <div class="glass-card rounded-3xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white">Cindy 20-Min Score (Rounds)</h3>
+            <p class="text-[11px] text-slate-400">Total volume & round progression</p>
+          </div>
+          <span class="text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg" id="cindyPrTag">PR: 14.7 Rnds</span>
+        </div>
+        <div class="h-44 w-full relative">
+          <canvas id="cindyTrendCanvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Strict Pull-Up Progress Chart -->
+      <div class="glass-card rounded-3xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white">Strict Pull-Up Rep Max</h3>
+            <p class="text-[11px] text-slate-400">Building up toward 5 clean deadhang reps</p>
+          </div>
+          <span class="text-xs font-black text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-2.5 py-0.5 rounded-lg" id="pullUpPrTag">Max: 3 Reps</span>
+        </div>
+        <div class="h-40 w-full relative">
+          <canvas id="pullUpTrendCanvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- PR Trophy Case -->
+      <div class="glass-card rounded-3xl p-4 space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Personal Record Trophy Case</h3>
+        <div class="grid grid-cols-2 gap-2.5">
+          <div class="bg-black/40 rounded-2xl p-3 border border-white/5">
+            <span class="text-[10px] text-cyan-400 font-bold uppercase block">Strict Pull-Ups</span>
+            <span class="text-xl font-black text-white" id="badgePullUps">3 Reps</span>
+            <span class="text-[10px] text-slate-400 block mt-0.5">Deadhang form</span>
+          </div>
+          <div class="bg-black/40 rounded-2xl p-3 border border-white/5">
+            <span class="text-[10px] text-emerald-400 font-bold uppercase block">Cindy 20M</span>
+            <span class="text-xl font-black text-white" id="badgeCindy">14.7 Rnds</span>
+            <span class="text-[10px] text-slate-400 block mt-0.5">441 Total Reps</span>
+          </div>
+          <div class="bg-black/40 rounded-2xl p-3 border border-white/5">
+            <span class="text-[10px] text-rose-400 font-bold uppercase block">Peloton Output</span>
+            <span class="text-xl font-black text-white" id="badgePeloton">342 kJ</span>
+            <span class="text-[10px] text-slate-400 block mt-0.5">30-min Ride</span>
+          </div>
+          <div class="bg-black/40 rounded-2xl p-3 border border-white/5">
+            <span class="text-[10px] text-amber-400 font-bold uppercase block">Romanian DL</span>
+            <span class="text-xl font-black text-white" id="badgeRdl">175 lbs</span>
+            <span class="text-[10px] text-slate-400 block mt-0.5">Top working set</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- VIEW 5: WORKOUT HISTORY & CLOUD BACKUP                                    -->
+    <!-- ========================================================================= -->
+    <section id="view-history" class="hidden space-y-4">
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Activity Log</span>
+          <h2 class="text-xl font-black text-white">Workout History</h2>
+        </div>
+        <button onclick="openBackupModal()" class="px-3 py-1.5 rounded-xl bg-cyan-500/10 text-cyan-300 font-bold text-xs border border-cyan-500/20 tap-press">
+          Backup / Export
+        </button>
+      </div>
+
+      <!-- History Feed -->
+      <div id="historyFeedList" class="space-y-3">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="pt-4 text-center">
+        <button onclick="confirmResetAllData()" class="text-xs text-rose-400 hover:text-rose-300 font-medium tap-press">
+          Clear All Stored Workouts
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Floating Rest Timer Overlay (Pops up when rest is active) -->
+  <div id="floatingRestBar" class="fixed bottom-24 left-4 right-4 max-w-md mx-auto z-40 hidden">
+    <div class="glass-card-elevated rounded-2xl p-3 border border-cyan-500/40 shadow-2xl flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400">
+          <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="4" stroke-dasharray="32" stroke-linecap="round"/></svg>
+        </div>
+        <div>
+          <span class="text-[9px] uppercase font-black text-slate-400 block tracking-wider">Resting Between Sets</span>
+          <span id="restTimerDisplay" class="text-xl font-black font-mono text-white">01:30</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-1.5">
+        <button onclick="adjustRestTimer(30)" class="px-2.5 py-1.5 rounded-xl bg-slate-800 text-xs font-bold text-slate-200 tap-press">+30s</button>
+        <button onclick="stopRestTimer()" class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center tap-press font-bold">✕</button>
       </div>
     </div>
+  </div>
 
-    <div id="coachingGuidance" class="guidance-box">
-      High autonomic recovery detected. Loading multiplier at <strong>+5%</strong>. Ideal day to test strict pull-up milestones or add 5 lbs to your RDL.
+  <!-- iOS Fixed Bottom Navigation Bar -->
+  <nav class="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-white/10 px-3 pt-2 pb-[max(env(safe-area-inset-bottom),12px)]">
+    <div class="max-w-md mx-auto grid grid-cols-5 gap-1 text-center">
+      
+      <!-- Tab 1: Today Workout -->
+      <button onclick="switchTab('today')" id="tab-nav-today" class="flex flex-col items-center py-1 text-cyan-400 tap-press transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span class="text-[10px] font-bold mt-1">Workout</span>
+      </button>
+
+      <!-- Tab 2: Programs / Builder -->
+      <button onclick="switchTab('programs')" id="tab-nav-programs" class="flex flex-col items-center py-1 text-slate-400 tap-press transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        <span class="text-[10px] font-medium mt-1">Programs</span>
+      </button>
+
+      <!-- Tab 3: Cindy (Highlighted Hero Action) -->
+      <button onclick="switchTab('cindy')" id="tab-nav-cindy" class="flex flex-col items-center py-1 text-slate-400 tap-press transition group">
+        <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 group-hover:bg-emerald-500/30 text-emerald-400 flex items-center justify-center -mt-2.5 shadow-lg shadow-emerald-500/25 border border-emerald-500/40">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <span class="text-[10px] font-bold mt-0.5 text-emerald-400">Cindy</span>
+      </button>
+
+      <!-- Tab 4: Analytics -->
+      <button onclick="switchTab('analytics')" id="tab-nav-analytics" class="flex flex-col items-center py-1 text-slate-400 tap-press transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span class="text-[10px] font-medium mt-1">Analytics</span>
+      </button>
+
+      <!-- Tab 5: History -->
+      <button onclick="switchTab('history')" id="tab-nav-history" class="flex flex-col items-center py-1 text-slate-400 tap-press transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span class="text-[10px] font-medium mt-1">History</span>
+      </button>
+
     </div>
-  </section>
-
-  <!-- NAVIGATION -->
-  <nav class="tabs">
-    <button class="tab-btn active" onclick="switchTab('monday')">Monday</button>
-    <button class="tab-btn" onclick="switchTab('wednesday')">Wednesday</button>
-    <button class="tab-btn" onclick="switchTab('cindy')">Cindy (Fri)</button>
-    <button class="tab-btn" onclick="switchTab('history')">Logs</button>
   </nav>
 
-  <!-- MONDAY: PULL & POSTERIOR -->
-  <section id="monday" class="workout-view active">
-    <div class="card">
-      <div class="exercise-title">Strict Pull-Up Progression</div>
-      <div class="exercise-subtitle">4 Sets × 3–5 Reps (3-4s slow eccentric)</div>
-      <div id="puSuggestion" class="load-suggestion">Target: Strict Bodyweight or +5 lb Vest</div>
-      <div class="set-row">
-        <div class="set-label">S1</div>
-        <input type="text" placeholder="Weight / Band" id="m_pu_w1">
-        <input type="number" placeholder="Reps" id="m_pu_r1">
-        <div class="check-btn" onclick="toggleSet(this)">✓</div>
+  <!-- MODAL 1: PROGRAM SWITCHER DRAWER -->
+  <div id="programSwitcherModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="glass-card-elevated rounded-t-3xl sm:rounded-3xl max-w-sm w-full p-5 space-y-4 max-h-[85vh] overflow-y-auto border border-white/20">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-7 h-7 rounded-xl grad-emerald flex items-center justify-center text-black font-black text-xs">P</div>
+          <h3 class="text-sm font-black text-white">Select Active Routine</h3>
+        </div>
+        <button onclick="closeProgramSwitcherModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">✕</button>
       </div>
-      <div class="set-row">
-        <div class="set-label">S2</div>
-        <input type="text" placeholder="Weight / Band" id="m_pu_w2">
-        <input type="number" placeholder="Reps" id="m_pu_r2">
-        <div class="check-btn" onclick="toggleSet(this)">✓</div>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="exercise-title">Romanian Deadlifts (RDL)</div>
-      <div class="exercise-subtitle">4 Sets × 8–10 Reps (Barbell or DBs)</div>
-      <div id="rdlSuggestion" class="load-suggestion">Suggested: 185 lbs (+5 lbs over baseline)</div>
-      <div class="set-row">
-        <div class="set-label">Load</div>
-        <input type="number" placeholder="Lbs" id="m_rdl_w">
-        <input type="number" placeholder="Reps" id="m_rdl_r">
-        <div class="check-btn" onclick="toggleSet(this)">✓</div>
+      <div id="programsModalList" class="space-y-2.5">
+        <!-- List of programs with "Set as Active" -->
+      </div>
+
+      <div class="pt-2">
+        <button onclick="closeProgramSwitcherModal(); openCreateProgramModal();" class="w-full py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs tap-press border border-white/15 flex items-center justify-center gap-1.5">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Build New Custom Program
+        </button>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="exercise-title">DB Bent-Over Row & OHP</div>
-      <div class="exercise-subtitle">3 Sets × 8–10 Reps each</div>
-      <div class="set-row">
-        <div class="set-label">Row</div>
-        <input type="number" placeholder="Row Lbs" id="m_row_w">
-        <input type="number" placeholder="Reps" id="m_row_r">
-        <div class="check-btn" onclick="toggleSet(this)">✓</div>
+  <!-- MODAL 2: PROGRAM BUILDER MODAL -->
+  <div id="createProgramModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="glass-card-elevated rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 space-y-4 max-h-[92vh] overflow-y-auto border border-white/20">
+      
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div>
+          <span class="text-[9px] font-black uppercase tracking-wider text-emerald-400">Architecture</span>
+          <h3 class="text-base font-black text-white">Build Custom Program</h3>
+        </div>
+        <button onclick="closeCreateProgramModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">✕</button>
       </div>
-      <div class="set-row">
-        <div class="set-label">Press</div>
-        <input type="number" placeholder="OHP Lbs" id="m_ohp_w">
-        <input type="number" placeholder="Reps" id="m_ohp_r">
-        <div class="check-btn" onclick="toggleSet(this)">✓</div>
+
+      <!-- Program Basic Info -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Program Name</label>
+          <input type="text" id="newProgTitle" placeholder="e.g. 4-Day Hypertrophy & Cindy" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Description / Focus</label>
+          <input type="text" id="newProgDesc" placeholder="e.g. Focus on chest, shoulders and pull-up power" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+        </div>
+      </div>
+
+      <!-- Program Days Container -->
+      <div class="space-y-3 pt-2 border-t border-white/10">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold text-white uppercase tracking-wider">Workout Days</label>
+          <button onclick="addNewBuilderDay()" class="text-xs text-emerald-400 font-bold tap-press flex items-center gap-1">
+            + Add Day
+          </button>
+        </div>
+
+        <div id="builderDaysList" class="space-y-3">
+          <!-- Dynamic Days Builder Cards -->
+        </div>
+      </div>
+
+      <div class="pt-3">
+        <button onclick="saveNewProgramFromBuilder()" class="w-full py-3.5 rounded-2xl grad-emerald text-black font-extrabold text-sm tap-press shadow-xl shadow-emerald-500/25">
+          Save & Activate Routine
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 3: EXERCISE PICKER & CUSTOM EXERCISE -->
+  <div id="exercisePickerModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card-elevated rounded-3xl max-w-sm w-full p-5 space-y-4 max-h-[85vh] flex flex-col border border-white/20">
+      
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-sm font-black text-white">Select Exercise</h3>
+        <button onclick="closeExercisePicker()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs font-bold">
+        <button onclick="filterPickerCategory('all')" class="px-2.5 py-1 rounded-lg bg-white/10 text-white picker-cat-btn active">All</button>
+        <button onclick="filterPickerCategory('strength')" class="px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 picker-cat-btn">Strength</button>
+        <button onclick="filterPickerCategory('cardio')" class="px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 picker-cat-btn">Cardio</button>
+        <button onclick="filterPickerCategory('wod')" class="px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 picker-cat-btn">WOD/AMRAP</button>
+      </div>
+
+      <!-- Search Box -->
+      <input type="text" id="pickerSearch" oninput="renderFilteredExerciseList()" placeholder="Search library (e.g. Pull-up, Squat)..." class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white">
+
+      <!-- Exercise Items Scrollable List -->
+      <div id="pickerItemsList" class="flex-1 overflow-y-auto space-y-2 pr-1">
+        <!-- Rendered items -->
+      </div>
+
+      <!-- Add Custom Exercise Trigger -->
+      <div class="pt-2 border-t border-white/10">
+        <button onclick="openAddCustomExerciseForm()" class="w-full py-2.5 rounded-xl bg-slate-800 text-cyan-300 text-xs font-bold border border-cyan-500/20 tap-press">
+          + Create Custom Exercise
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 4: ADD CUSTOM EXERCISE SUB-FORM -->
+  <div id="customExerciseFormModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card-elevated rounded-3xl max-w-xs w-full p-5 space-y-3.5 border border-white/20">
+      <h4 class="text-sm font-black text-white">New Custom Exercise</h4>
+      
+      <div>
+        <label class="block text-[11px] text-slate-300 mb-1">Exercise Name</label>
+        <input type="text" id="custExName" placeholder="e.g., Pendlay Row" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white">
+      </div>
+
+      <div>
+        <label class="block text-[11px] text-slate-300 mb-1">Exercise Category</label>
+        <select id="custExCategory" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white">
+          <option value="strength">Strength (Sets × Weight × Reps)</option>
+          <option value="cardio">Cardio (Output, Cadence, Duration)</option>
+          <option value="wod">WOD / AMRAP (Timed Rounds & Reps)</option>
+          <option value="mobility">Core & Mobility</option>
+        </select>
+      </div>
+
+      <div class="flex gap-2 pt-2">
+        <button onclick="closeAddCustomExerciseForm()" class="flex-1 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold tap-press">Cancel</button>
+        <button onclick="saveCustomExerciseToLibrary()" class="flex-1 py-2 rounded-xl grad-cyan text-black text-xs font-extrabold tap-press">Create</button>
       </div>
     </div>
+  </div>
 
-    <button class="action-btn" onclick="saveSession('Monday Strength')">Save Monday Workout</button>
-  </section>
+  <!-- MODAL 5: CINDY SURVIVAL GUIDE -->
+  <div id="strategyModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card-elevated rounded-3xl max-w-sm w-full p-5 space-y-4 border border-emerald-500/30">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">⚡</div>
+          <h3 class="text-sm font-black text-white">Cindy Pacing Strategy</h3>
+        </div>
+        <button onclick="closeStrategyModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">✕</button>
+      </div>
 
-  <!-- WEDNESDAY: PRESS & LEGS -->
-  <section id="wednesday" class="workout-view">
-    <div class="card">
-      <div class="exercise-title">Incline DB Bench Press</div>
-      <div class="exercise-subtitle">3 Sets × 8–10 Reps</div>
-      <div id="incSuggestion" class="load-suggestion">Suggested: Baseline DB Working Weight</div>
-      <div class="set-row">
-        <div class="set-label">Top</div>
-        <input type="number" placeholder="Lbs/hand" id="w_inc_w">
-        <input type="number" placeholder="Reps" id="w_inc_r">
-        <div class="check-btn" onclick="toggleSet(this)">✓</div>
+      <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed">
+        <div class="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/20">
+          <span class="font-bold text-emerald-300 block mb-0.5">1. Break The Pull-Ups Early</span>
+          Don't grind out 5 reps unbroken in Round 1. Start with 3 reps, take 2 deep breaths, then complete 2 reps. This prevents lat lactic acid lockup.
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900 border border-white/10">
+          <span class="font-bold text-cyan-300 block mb-0.5">2. Strict Hollow-BodyMidline</span>
+          Keep feet slightly in front of the bar. A braced core transfers lat drive directly upward and eliminates sloppy swinging.
+        </div>
+        <div class="p-2.5 rounded-xl bg-slate-900 border border-white/10">
+          <span class="font-bold text-amber-300 block mb-0.5">3. Air Squat Cadence</span>
+          Use the air squats as your aerobic recovery. Keep a rhythm of 1 squat per second (15 seconds total) before hopping back on the bar.
+        </div>
+      </div>
+
+      <button onclick="closeStrategyModal()" class="w-full py-2.5 rounded-xl grad-emerald text-black font-extrabold text-xs tap-press">
+        Understood, Let's Execute
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 6: BACKUP & DATA RESTORE -->
+  <div id="backupModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card-elevated rounded-3xl max-w-sm w-full p-5 space-y-4 border border-white/20">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-sm font-black text-white">Data Sync & Backup</h3>
+        <button onclick="closeBackupModal()" class="w-7 h-7 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <button onclick="exportJSONBackup()" class="w-full py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold tap-press">
+          Copy JSON Backup to Clipboard
+        </button>
+        <div>
+          <label class="text-[11px] text-slate-400 block mb-1">Restore from JSON</label>
+          <textarea id="importJsonBox" rows="3" placeholder="Paste exported JSON here..." class="w-full bg-slate-900 border border-white/10 rounded-xl p-2 text-slate-300 font-mono text-[10px]"></textarea>
+          <button onclick="importJSONBackup()" class="w-full mt-2 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold border border-white/10 tap-press">
+            Import & Overwrite
+          </button>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="exercise-title">Bulgarian Split Squats</div>
-      <div class="exercise-subtitle">3 Sets × 8 Reps / leg</div>
-      <div class="set-row">
-        <div class="set-label">Top</div>
-        <input type="number" placeholder="Lbs" id="w_bss_w">
-        <input type="number" placeholder="Reps" id="w_bss_r">
-        <div class="check-btn" onclick="toggleSet(this)">✓</div>
-      </div>
+  <!-- Toast Notification Bar -->
+  <div id="appToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 -translate-y-4">
+    <div id="toastContent" class="glass-card-elevated px-4 py-2.5 rounded-2xl border border-white/20 text-xs font-bold text-white shadow-2xl flex items-center gap-2">
+      <!-- Injected -->
     </div>
-
-    <button class="action-btn" onclick="saveSession('Wednesday Strength')">Save Wednesday Workout</button>
-  </section>
-
-  <!-- FRIDAY: CINDY -->
-  <section id="cindy" class="workout-view">
-    <div class="card cindy-box">
-      <div style="font-size: 12px; color: var(--muted); text-transform: uppercase;">Cindy 20-Min AMRAP</div>
-      <div id="cindySuggestion" class="load-suggestion" style="margin-top: 6px;">Pacing: Aim for 18–20+ Rounds</div>
-      <div id="cindyRounds" class="cindy-rounds">0</div>
-      <div class="cindy-btn-row">
-        <button class="cindy-btn btn-sub" onclick="adjustCindy(-1)">-1</button>
-        <button class="cindy-btn btn-add" onclick="adjustCindy(1)">+1 Complete Round</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <input type="number" id="cindyExtra" placeholder="Partial reps completed (0–29)" style="margin-bottom: 8px;">
-      <input type="text" id="cindyNotes" placeholder="Notes (e.g., Pull-ups unbroken till round 8)">
-    </div>
-
-    <button class="action-btn" style="background: var(--green); color: #000;" onclick="saveCindy()">Record Cindy AMRAP</button>
-  </section>
-
-  <!-- HISTORY -->
-  <section id="history" class="workout-view">
-    <div class="card">
-      <div class="exercise-title" style="margin-bottom: 12px;">Saved Workouts</div>
-      <div id="historyList"></div>
-    </div>
-  </section>
+  </div>
 
   <script>
-    let rounds = 0;
+    /* ========================================================================= */
+    /* 1. SYNTHESIZED WEB AUDIO ENGINE (Zero External Files)                     */
+    /* ========================================================================= */
+    let audioContext = null;
 
-    // Parse URL parameters from Athlytic Shortcut (e.g. ?rec=78&ex=12.4)
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('dateLabel').innerText = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-      const params = new URLSearchParams(window.location.search);
-      if (params.has('rec')) {
-        document.getElementById('recoveryInput').value = params.get('rec');
+    function initAudio() {
+      if (!audioContext) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AudioCtx();
       }
-      if (params.has('ex')) {
-        document.getElementById('exertionInput').value = params.get('ex');
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
       }
-      updateReadiness();
-    });
+      return audioContext;
+    }
 
-    function updateReadiness() {
-      const rec = parseInt(document.getElementById('recoveryInput').value);
-      const ex = parseFloat(document.getElementById('exertionInput').value);
+    function playAudioTone(toneType) {
+      try {
+        const ctx = initAudio();
+        const t = ctx.currentTime;
 
-      document.getElementById('recoveryDisplay').innerText = rec + '%';
-      document.getElementById('exertionDisplay').innerText = ex.toFixed(1);
+        if (toneType === 'click') {
+          // Tactile tap
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(360, t);
+          osc.frequency.exponentialRampToValueAtTime(100, t + 0.04);
+          gain.gain.setValueAtTime(0.2, t);
+          gain.gain.linearRampToValueAtTime(0.01, t + 0.04);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.04);
+        } else if (toneType === 'check') {
+          // Set completion ping
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc1.frequency.setValueAtTime(523.25, t); // C5
+          osc2.frequency.setValueAtTime(783.99, t + 0.07); // G5
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.linearRampToValueAtTime(0.01, t + 0.26);
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(ctx.destination);
+          osc1.start(t);
+          osc2.start(t + 0.07);
+          osc1.stop(t + 0.07);
+          osc2.stop(t + 0.26);
+        } else if (toneType === 'beep') {
+          // Countdown tone
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, t);
+          gain.gain.setValueAtTime(0.25, t);
+          gain.gain.exponentialRampToValueAtTime(0.01, t + 0.12);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.12);
+        } else if (toneType === 'fanfare') {
+          // Workout finished chord
+          [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, t + i * 0.06);
+            gain.gain.setValueAtTime(0.3, t + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.85);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(t + i * 0.06);
+            osc.stop(t + 0.85);
+          });
+        }
+      } catch (err) {
+        console.warn('Audio play avoided:', err);
+      }
+    }
 
-      const badge = document.getElementById('statusBadge');
-      const recDisp = document.getElementById('recoveryDisplay');
-      const guide = document.getElementById('coachingGuidance');
-      const puSugg = document.getElementById('puSuggestion');
-      const rdlSugg = document.getElementById('rdlSuggestion');
-      const cindySugg = document.getElementById('cindySuggestion');
+    function testAudioTone() {
+      playAudioTone('fanfare');
+      showToast('🔊 Audio feedback tested and working!');
+    }
 
-      if (rec >= 67) {
-        // GREEN ZONE
-        badge.className = "readiness-badge badge-green";
-        badge.innerText = "Prime to Push";
-        recDisp.style.color = "var(--green)";
-        guide.innerHTML = `High autonomic recovery (<strong>${rec}%</strong>). Athlytic green zone: push +2.5% to +5% on main compound lifts and attempt your strict pull-up rep ceiling.`;
-        puSugg.innerText = "Target: Test 5-rep capacity or add +5-10 lbs";
-        rdlSugg.innerText = "Overload Mode: Add +5 lbs to working sets";
-        cindySugg.innerText = "Aggressive Pacing: Target 18–21+ Rounds";
-      } else if (rec >= 34) {
-        // YELLOW ZONE
-        badge.className = "readiness-badge badge-yellow";
-        badge.innerText = "Steady State";
-        recDisp.style.color = "var(--yellow)";
-        guide.innerHTML = `Moderate recovery (<strong>${rec}%</strong>). Maintain baseline loads at RPE 7.5–8. Focus on 3-second pull-up negatives rather than forcing rep records.`;
-        puSugg.innerText = "Target: 3–4 clean reps with strict 3s negative";
-        rdlSugg.innerText = "Maintenance: Stick to standard working weight";
-        cindySugg.innerText = "Aerobic Cadence: Steady 1:15/round pace";
+    /* ========================================================================= */
+    /* 2. PRE-LOADED DATA & CINDY MASTER SPLIT DEFAULT                           */
+    /* ========================================================================= */
+    const STORAGE_KEY = 'aerofit_pro_master_v3';
+
+    const EXERCISE_LIBRARY = [
+      // Strength
+      { id: 'lib-1', name: 'Strict Pull-Ups', category: 'strength', defaultSets: 4, defaultReps: '3-5', notes: 'Tempo eccentric 3-4s' },
+      { id: 'lib-2', name: 'Banded Pull-Ups', category: 'strength', defaultSets: 4, defaultReps: '6-8', notes: 'Continuous lat tension' },
+      { id: 'lib-3', name: 'Romanian Deadlift (RDL)', category: 'strength', defaultSets: 4, defaultReps: '8-10', notes: 'Hamstrings & glutes hinge' },
+      { id: 'lib-4', name: 'Bent-Over DB Rows', category: 'strength', defaultSets: 3, defaultReps: '8-10', notes: 'Mid-back lat thickness' },
+      { id: 'lib-5', name: 'Standing DB Overhead Press', category: 'strength', defaultSets: 3, defaultReps: '8-10', notes: 'Vertical push antagonist balance' },
+      { id: 'lib-6', name: 'Hanging Scapular Pulls', category: 'strength', defaultSets: 3, defaultReps: '8-10', notes: '2s isometric hold at top' },
+      { id: 'lib-7', name: 'Incline DB Bench Press', category: 'strength', defaultSets: 3, defaultReps: '8-10', notes: 'Upper chest & triceps' },
+      { id: 'lib-8', name: 'Bulgarian Split Squats', category: 'strength', defaultSets: 3, defaultReps: '8/leg', notes: 'Unilateral leg strength' },
+      { id: 'lib-9', name: 'Inverted Rows (Bar/Rings)', category: 'strength', defaultSets: 3, defaultReps: '10-12', notes: 'Horizontal pulling volume' },
+      { id: 'lib-10', name: 'Face Pulls / Rear Delt', category: 'strength', defaultSets: 3, defaultReps: '12-15', notes: 'Shoulder stability' },
+      { id: 'lib-11', name: 'Suitcase / Farmer\'s Carries', category: 'strength', defaultSets: 3, defaultReps: '50 steps', notes: 'Hanging grip conditioning' },
+      { id: 'lib-12', name: 'Barbell Back Squat', category: 'strength', defaultSets: 4, defaultReps: '6-8', notes: 'Quad drive' },
+      { id: 'lib-13', name: 'Barbell Deadlift', category: 'strength', defaultSets: 4, defaultReps: '5', notes: 'Full posterior power' },
+      { id: 'lib-14', name: 'Flat Dumbbell Press', category: 'strength', defaultSets: 3, defaultReps: '8-10', notes: 'Horizontal press' },
+      { id: 'lib-15', name: 'Dips (Parallel Bar)', category: 'strength', defaultSets: 3, defaultReps: '8-10', notes: 'Chest & triceps' },
+      { id: 'lib-16', name: 'Lat Pulldown', category: 'strength', defaultSets: 3, defaultReps: '10-12', notes: 'Vertical pulling accessory' },
+      { id: 'lib-17', name: 'Bicep Dumbbell Curls', category: 'strength', defaultSets: 3, defaultReps: '10-12', notes: 'Elbow flexor hypertrophy' },
+      // Cardio
+      { id: 'lib-18', name: 'Peloton / Cycling Ride', category: 'cardio', defaultDuration: 30, notes: 'Target output & cadence' },
+      { id: 'lib-19', name: 'Peloton Power Intervals', category: 'cardio', defaultDuration: 30, notes: 'HIIT & Hills class' },
+      { id: 'lib-20', name: 'Indoor Rowing', category: 'cardio', defaultDuration: 20, notes: '500m split pace' },
+      { id: 'lib-21', name: 'Running / Treadmill', category: 'cardio', defaultDuration: 25, notes: 'Zone 2 or sprints' },
+      // WOD
+      { id: 'lib-22', name: 'Cindy 20-Min AMRAP', category: 'wod', duration: 20, notes: '5 Pull-ups, 10 Push-ups, 15 Squats' },
+      { id: 'lib-23', name: 'Custom AMRAP Workout', category: 'wod', duration: 15, notes: 'As many rounds as possible' }
+    ];
+
+    const DEFAULT_CINDY_PROGRAM = {
+      id: 'cindy-master-split',
+      title: 'Cindy Master Split',
+      isDefault: true,
+      description: 'Dedicated pull-up strength & posterior chain on Monday, Peloton flush rides on Tue/Thu, pressing & unilateral stability on Wednesday, and Friday Cindy 20-min AMRAP benchmark.',
+      days: [
+        {
+          id: 'day-mon',
+          name: 'Monday',
+          label: 'Mon',
+          dayOfWeek: 1,
+          title: 'Pull Strength & Posterior Chain',
+          tag: 'Pull Day',
+          category: 'strength',
+          color: 'cyan',
+          exercises: [
+            { id: 'ex-1', name: 'Strict Pull-Ups', category: 'strength', sets: 4, targetReps: '3-5', notes: '3-4s slow eccentric descent on every rep', lastLogged: '3, 3, 2, 2' },
+            { id: 'ex-2', name: 'Romanian Deadlift (RDL)', category: 'strength', sets: 4, targetReps: '8-10', notes: 'Hamstrings & glutes hinge balance', lastLogged: '155 lbs' },
+            { id: 'ex-3', name: 'Bent-Over DB Rows', category: 'strength', sets: 3, targetReps: '8-10', notes: 'Horizontal lat thickness', lastLogged: '50 lbs' },
+            { id: 'ex-4', name: 'Standing DB Overhead Press', category: 'strength', sets: 3, targetReps: '8-10', notes: 'Vertical press antagonist', lastLogged: '35 lbs' },
+            { id: 'ex-5', name: 'Hanging Scapular Pulls', category: 'strength', sets: 3, targetReps: '8-10', notes: '2s isometric hold at top', lastLogged: 'Bodyweight' }
+          ]
+        },
+        {
+          id: 'day-tue',
+          name: 'Tuesday',
+          label: 'Tue',
+          dayOfWeek: 2,
+          title: 'Peloton Cadence & Output Endurance',
+          tag: 'Peloton',
+          category: 'cardio',
+          color: 'coral',
+          exercises: [
+            { id: 'ex-6', name: 'Peloton / Cycling Ride', category: 'cardio', duration: 30, targetOutput: 320, notes: 'Leg aerobic flush, zero upper-body DOMS' }
+          ]
+        },
+        {
+          id: 'day-wed',
+          name: 'Wednesday',
+          label: 'Wed',
+          dayOfWeek: 3,
+          title: 'Pressing, Unilateral & Grip',
+          tag: 'Press & Leg',
+          category: 'strength',
+          color: 'gold',
+          exercises: [
+            { id: 'ex-7', name: 'Incline DB Bench Press', category: 'strength', sets: 3, targetReps: '8-10', notes: 'Upper chest & triceps, saves flat endurance', lastLogged: '45 lbs' },
+            { id: 'ex-8', name: 'Bulgarian Split Squats', category: 'strength', sets: 3, targetReps: '8/leg', notes: 'Unilateral quad & hip stability', lastLogged: '30 lbs DBs' },
+            { id: 'ex-9', name: 'Inverted Rows (Bar/Rings)', category: 'strength', sets: 3, targetReps: '10-12', notes: 'Midpoint pull-up reinforcement', lastLogged: 'Bodyweight' },
+            { id: 'ex-10', name: 'Face Pulls / Rear Delt', category: 'strength', sets: 3, targetReps: '12-15', notes: 'Rotator cuff health', lastLogged: '35 lbs' },
+            { id: 'ex-11', name: 'Suitcase / Farmer\'s Carries', category: 'strength', sets: 3, targetReps: '50 steps', notes: 'Grip & forearm endurance', lastLogged: '50 lbs/hand' }
+          ]
+        },
+        {
+          id: 'day-thu',
+          name: 'Thursday',
+          label: 'Thu',
+          dayOfWeek: 4,
+          title: 'Peloton High-Intensity Intervals',
+          tag: 'Peloton HIIT',
+          category: 'cardio',
+          color: 'coral',
+          exercises: [
+            { id: 'ex-12', name: 'Peloton Power Intervals', category: 'cardio', duration: 30, targetOutput: 340, notes: 'HIIT & Hills class ride' }
+          ]
+        },
+        {
+          id: 'day-fri',
+          name: 'Friday',
+          label: 'Fri',
+          dayOfWeek: 5,
+          title: 'The Cindy Benchmark AMRAP',
+          tag: 'Cindy AMRAP',
+          category: 'wod',
+          color: 'emerald',
+          isCindyBenchmark: true,
+          exercises: [
+            { id: 'ex-13', name: 'Cindy 20-Min AMRAP', category: 'wod', duration: 20, notes: '5 Pull-ups, 10 Push-ups, 15 Air Squats' }
+          ]
+        },
+        {
+          id: 'day-sat',
+          name: 'Saturday',
+          label: 'Sat',
+          dayOfWeek: 6,
+          title: 'Active Recovery & Mobility',
+          tag: 'Mobility',
+          category: 'mobility',
+          color: 'slate',
+          exercises: [
+            { id: 'ex-14', name: 'Thoracic & Lat Mobility Flow', category: 'mobility', sets: 1, targetReps: '15 min', notes: 'Deadhangs & foam rolling' }
+          ]
+        },
+        {
+          id: 'day-sun',
+          name: 'Sunday',
+          label: 'Sun',
+          dayOfWeek: 0,
+          title: 'Rest & Tissue Prep',
+          tag: 'Rest',
+          category: 'mobility',
+          color: 'slate',
+          exercises: [
+            { id: 'ex-15', name: 'Light Walking & Foam Roll', category: 'mobility', sets: 1, targetReps: '30 min', notes: 'Decompress for Monday pull day' }
+          ]
+        }
+      ]
+    };
+
+    const INITIAL_STATE = {
+      activeProgramId: 'cindy-master-split',
+      programs: [DEFAULT_CINDY_PROGRAM],
+      library: EXERCISE_LIBRARY,
+      pullUpMax: 2,
+      pullUpGoal: 5,
+      prs: { pullUps: 3, cindy: 14.7, peloton: 342, rdl: 175 },
+      cindyLogs: [
+        { date: 'Sep 01', rounds: 11.3 },
+        { date: 'Sep 08', rounds: 12.7 },
+        { date: 'Sep 15', rounds: 13.5 },
+        { date: 'Sep 22', rounds: 14.7 }
+      ],
+      pullUpLogs: [
+        { date: 'Aug 28', reps: 1 },
+        { date: 'Sep 07', reps: 2 },
+        { date: 'Sep 14', reps: 2 },
+        { date: 'Sep 21', reps: 3 }
+      ],
+      history: [
+        {
+          id: 'hist-1',
+          date: 'Sep 22, 2026',
+          title: 'Cindy 20-Min AMRAP',
+          category: 'wod',
+          details: '14 Rounds + 20 Reps (440 reps total) • 3-2 pull-up split',
+          color: 'emerald'
+        },
+        {
+          id: 'hist-2',
+          date: 'Sep 20, 2026',
+          title: 'Wednesday Press & Unilateral',
+          category: 'strength',
+          details: 'Incline DB 45lbs x 10, 10, 8 • Split Squats 30lbs • 50 steps carry',
+          color: 'gold'
+        },
+        {
+          id: 'hist-3',
+          date: 'Sep 18, 2026',
+          title: 'Peloton: 30-min HIIT Ride',
+          category: 'cardio',
+          details: '342 kJ Output • 84 Avg RPM • 49% Resistance (New PR)',
+          color: 'coral'
+        },
+        {
+          id: 'hist-4',
+          date: 'Sep 17, 2026',
+          title: 'Monday Pull & Posterior Chain',
+          category: 'strength',
+          details: 'Strict Pull-Ups 4x3 (4s eccentric) • RDL 175lbs 4x8 • DB Rows 55lbs',
+          color: 'cyan'
+        }
+      ]
+    };
+
+    function loadState() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_STATE));
+        return INITIAL_STATE;
+      }
+      try {
+        const parsed = JSON.parse(stored);
+        if (!parsed.programs || !parsed.activeProgramId) return INITIAL_STATE;
+        return parsed;
+      } catch (e) {
+        return INITIAL_STATE;
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    }
+
+    let appState = loadState();
+    let currentSelectedDayIndex = 0;
+
+    /* ========================================================================= */
+    /* 3. ACTIVE WORKOUT & DAY EXECUTION ENGINE                                  */
+    /* ========================================================================= */
+    function getActiveProgram() {
+      return appState.programs.find(p => p.id === appState.activeProgramId) || appState.programs[0];
+    }
+
+    function initWorkoutView() {
+      const prog = getActiveProgram();
+      document.getElementById('activeProgramSubtitle').innerText = prog.title;
+      document.getElementById('currentProgramHeading').innerText = prog.title;
+      document.getElementById('currentProgramDescription').innerText = prog.description;
+      document.getElementById('activeProgramDaysCount').innerText = `${prog.days.length} Days/Week`;
+
+      // Show/Hide Pull-up Goal widget if program has pull-ups
+      const hasPullUps = JSON.stringify(prog).toLowerCase().includes('pull-up');
+      document.getElementById('pullUpGoalWidget').style.display = hasPullUps ? 'block' : 'none';
+      if (hasPullUps) {
+        document.getElementById('pullUpRatioText').innerText = `${appState.pullUpMax} / ${appState.pullUpGoal} Clean Reps`;
+        const pct = Math.min(100, Math.round((appState.pullUpMax / appState.pullUpGoal) * 100));
+        document.getElementById('pullUpProgressBar').style.width = `${pct}%`;
+      }
+
+      // Match today's day of the week if within bounds
+      const todayDayOfWeek = new Date().getDay();
+      const matchIndex = prog.days.findIndex(d => d.dayOfWeek === todayDayOfWeek);
+      currentSelectedDayIndex = matchIndex >= 0 ? matchIndex : 0;
+
+      renderDayTabs();
+      renderCurrentDayWorkout();
+    }
+
+    function renderDayTabs() {
+      const prog = getActiveProgram();
+      const container = document.getElementById('programDaysTabs');
+      
+      container.innerHTML = prog.days.map((day, idx) => {
+        const isSelected = idx === currentSelectedDayIndex;
+        const colorClass = isSelected ? 'bg-cyan-500 text-black font-extrabold shadow-md' : 'text-slate-400 hover:text-white bg-slate-900/60';
+        return `
+          <button onclick="selectWorkoutDay(${idx})" class="px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all tap-press ${colorClass}">
+            <span>${day.label || day.name.slice(0, 3)}</span>
+            <span class="text-[9px] opacity-75 block font-normal">${day.tag || ''}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectWorkoutDay(idx) {
+      playAudioTone('click');
+      currentSelectedDayIndex = idx;
+      renderDayTabs();
+      renderCurrentDayWorkout();
+    }
+
+    function renderCurrentDayWorkout() {
+      const prog = getActiveProgram();
+      const day = prog.days[currentSelectedDayIndex];
+      const container = document.getElementById('dayWorkoutContent');
+
+      if (!day) return;
+
+      // Header for selected day
+      let html = `
+        <div class="p-3.5 rounded-2xl glass-card border border-white/10 flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-wider text-cyan-400">${day.name} Focus</span>
+            <h3 class="text-sm font-bold text-white">${day.title}</h3>
+          </div>
+          <button onclick="startRestTimer(90)" class="px-2.5 py-1 text-xs font-bold rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 tap-press flex items-center gap-1">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            90s Rest
+          </button>
+        </div>
+      `;
+
+      // If Cindy Benchmark day, show instant launcher
+      if (day.isCindyBenchmark || day.title.toLowerCase().includes('cindy')) {
+        html += `
+          <div class="glass-card-elevated rounded-3xl p-5 border border-emerald-500/30 text-center glow-emerald space-y-3">
+            <div class="w-12 h-12 rounded-2xl grad-emerald mx-auto flex items-center justify-center text-black font-black text-xl shadow-lg">⚡</div>
+            <h3 class="text-lg font-black text-white">Friday Cindy AMRAP Benchmark</h3>
+            <p class="text-xs text-slate-300">20-minute countdown, live SVG circle dial, round tap counter, and pacing analytics.</p>
+            <button onclick="switchTab('cindy')" class="w-full py-3.5 rounded-2xl grad-emerald text-black font-black text-sm tap-press shadow-xl shadow-emerald-500/25">
+              Open Live Cindy Station →
+            </button>
+          </div>
+        `;
+      }
+
+      // Render Exercises
+      day.exercises.forEach((ex, exIdx) => {
+        if (ex.category === 'strength') {
+          html += renderStrengthCard(ex, exIdx);
+        } else if (ex.category === 'cardio') {
+          html += renderCardioCard(ex, exIdx);
+        } else if (ex.category === 'wod') {
+          if (!day.isCindyBenchmark) html += renderWodCard(ex, exIdx);
+        } else {
+          html += renderMobilityCard(ex, exIdx);
+        }
+      });
+
+      html += `
+        <button onclick="saveActiveDayWorkout()" class="w-full py-4 rounded-2xl grad-cyan text-black font-extrabold text-sm tap-press shadow-xl shadow-cyan-500/20">
+          Save Completed ${day.name} Workout
+        </button>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function renderStrengthCard(ex, exIdx) {
+      const setsCount = ex.sets || 3;
+      let setRowsHtml = '';
+
+      for (let s = 1; s <= setsCount; s++) {
+        setRowsHtml += `
+          <div class="grid grid-cols-12 gap-2 items-center bg-slate-900/60 p-1.5 rounded-xl border border-white/5">
+            <span class="col-span-2 text-center text-xs font-bold text-slate-400 font-mono">S${s}</span>
+            <input type="text" id="set_load_${exIdx}_${s}" placeholder="${ex.lastLogged || 'Lbs'}" class="col-span-4 bg-black/50 border border-white/10 rounded-lg py-1.5 text-center text-xs text-white">
+            <input type="number" id="set_reps_${exIdx}_${s}" placeholder="${ex.targetReps || '8'}" class="col-span-3 bg-black/50 border border-white/10 rounded-lg py-1.5 text-center text-xs text-white font-mono">
+            <button onclick="toggleSetCheck(this)" class="col-span-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold tap-press border border-white/5 hover:bg-emerald-600 hover:text-white transition">✓</button>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="glass-card rounded-2xl p-4 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <h4 class="text-sm font-bold text-white">${ex.name}</h4>
+              <p class="text-[11px] text-slate-400">${setsCount} sets × ${ex.targetReps || '8-10 reps'} • ${ex.notes || ''}</p>
+            </div>
+            ${ex.lastLogged ? `<span class="text-[9px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono border border-white/5">Last: ${ex.lastLogged}</span>` : ''}
+          </div>
+          <div class="space-y-1.5">
+            <div class="grid grid-cols-12 gap-2 text-[9px] font-bold text-slate-400 uppercase text-center px-1">
+              <span class="col-span-2">Set</span>
+              <span class="col-span-4">Weight/Load</span>
+              <span class="col-span-3">Reps</span>
+              <span class="col-span-3">Done</span>
+            </div>
+            ${setRowsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCardioCard(ex, exIdx) {
+      return `
+        <div class="glass-card rounded-2xl p-4 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[9px] font-black uppercase text-rose-400 px-1.5 py-0.5 rounded bg-rose-500/10">Cardio / Peloton</span>
+              <h4 class="text-sm font-bold text-white mt-1">${ex.name}</h4>
+              <p class="text-[11px] text-slate-400">${ex.notes || 'Endurance and cardiac conditioning'}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-1">Total Output (kJ)</label>
+              <input type="number" id="cardio_out_${exIdx}" placeholder="e.g. 330" class="w-full bg-slate-900 border border-white/10 rounded-xl p-2 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-1">Duration (Mins)</label>
+              <input type="number" id="cardio_dur_${exIdx}" value="${ex.duration || 30}" class="w-full bg-slate-900 border border-white/10 rounded-xl p-2 text-xs text-white font-mono">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-1">Avg Cadence (RPM)</label>
+              <input type="number" id="cardio_cad_${exIdx}" placeholder="e.g. 82" class="w-full bg-slate-900 border border-white/10 rounded-xl p-2 text-xs text-white font-mono">
+            </div>
+            <div>
+              <label class="block text-[10px] font-semibold text-slate-400 mb-1">Avg Resistance (%)</label>
+              <input type="number" id="cardio_res_${exIdx}" placeholder="e.g. 48" class="w-full bg-slate-900 border border-white/10 rounded-xl p-2 text-xs text-white font-mono">
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWodCard(ex, exIdx) {
+      return `
+        <div class="glass-card rounded-2xl p-4 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[9px] font-black uppercase text-emerald-400 px-1.5 py-0.5 rounded bg-emerald-500/10">WOD</span>
+              <h4 class="text-sm font-bold text-white mt-1">${ex.name}</h4>
+              <p class="text-[11px] text-slate-400">${ex.notes || ''}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <input type="number" id="wod_rnds_${exIdx}" placeholder="Rounds Completed" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs text-white font-mono">
+            <input type="number" id="wod_reps_${exIdx}" placeholder="Extra Reps" class="bg-slate-900 border border-white/10 rounded-xl p-2 text-xs text-white font-mono">
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMobilityCard(ex, exIdx) {
+      return `
+        <div class="glass-card rounded-2xl p-3.5 flex items-center justify-between">
+          <div>
+            <h4 class="text-xs font-bold text-white">${ex.name}</h4>
+            <p class="text-[10px] text-slate-400">${ex.targetReps || '15 min'} • ${ex.notes || ''}</p>
+          </div>
+          <button onclick="toggleSetCheck(this)" class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-400 text-xs font-bold tap-press border border-white/5">
+            ✓ Done
+          </button>
+        </div>
+      `;
+    }
+
+    function toggleSetCheck(btn) {
+      const isDone = btn.classList.contains('bg-emerald-600');
+      if (!isDone) {
+        playAudioTone('check');
+        btn.className = 'col-span-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-black tap-press shadow-md shadow-emerald-500/20';
+        btn.innerText = 'DONE';
+        startRestTimer(90);
       } else {
-        // RED ZONE
-        badge.className = "readiness-badge badge-red";
-        badge.innerText = "Fatigued • Deload";
-        recDisp.style.color = "var(--red)";
-        guide.innerHTML = `Low recovery (<strong>${rec}%</strong>) or high prior exertion. Auto-deload: reduce working weights by 10% and use band assistance to protect your tendons.`;
-        puSugg.innerText = "Target: Band-assisted or slow eccentrics only";
-        rdlSugg.innerText = "Deload: Reduce weight by 10–15%";
-        cindySugg.innerText = "Cap Heart Rate: Paced subsets (12–14 rounds)";
+        playAudioTone('click');
+        btn.className = 'col-span-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold tap-press border border-white/5';
+        btn.innerText = '✓';
       }
     }
 
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.workout-view').forEach(v => v.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById(tab).classList.add('active');
-      if (tab === 'history') renderHistory();
-    }
+    function saveActiveDayWorkout() {
+      playAudioTone('check');
+      const prog = getActiveProgram();
+      const day = prog.days[currentSelectedDayIndex];
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    function toggleSet(btn) { btn.classList.toggle('done'); }
+      // Gather summary
+      let summary = `${day.title} • Completed`;
+      let loggedCategory = day.category || 'strength';
 
-    function adjustCindy(delta) {
-      rounds = Math.max(0, rounds + delta);
-      document.getElementById('cindyRounds').innerText = rounds;
-    }
-
-    function saveSession(title) {
-      const rec = document.getElementById('recoveryInput').value;
-      const logs = JSON.parse(localStorage.getItem('aerofit_logs') || '[]');
-      logs.unshift({
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        title: `${title} (Recovery: ${rec}%)`,
-        details: 'Workout logged under auto-regulation'
-      });
-      localStorage.setItem('aerofit_logs', JSON.stringify(logs));
-      alert('Workout saved!');
-    }
-
-    function saveCindy() {
-      const rec = document.getElementById('recoveryInput').value;
-      const extra = document.getElementById('cindyExtra').value || 0;
-      const notes = document.getElementById('cindyNotes').value;
-      const logs = JSON.parse(localStorage.getItem('aerofit_logs') || '[]');
-      logs.unshift({
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        title: `Cindy: ${rounds} Rds + ${extra} Reps`,
-        details: `Recovery: ${rec}% • ${notes || 'Standard AMRAP'}`
-      });
-      localStorage.setItem('aerofit_logs', JSON.stringify(logs));
-      alert(`Cindy logged: ${rounds} rounds!`);
-      rounds = 0;
-      document.getElementById('cindyRounds').innerText = 0;
-    }
-
-    function renderHistory() {
-      const list = document.getElementById('historyList');
-      const logs = JSON.parse(localStorage.getItem('aerofit_logs') || '[]');
-      if (!logs.length) {
-        list.innerHTML = "<p style='color:var(--muted); font-size:13px;'>No workouts logged yet.</p>";
-        return;
+      // Check if strict pull-up PR occurred
+      const pullUpInput = document.getElementById('set_reps_0_1');
+      if (pullUpInput && pullUpInput.value) {
+        const val = parseInt(pullUpInput.value);
+        if (val > appState.pullUpMax) {
+          appState.pullUpMax = val;
+          appState.pullUpLogs.push({ date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), reps: val });
+          showToast(`🔥 NEW STRICT PULL-UP PR: ${val} REPS!`);
+        }
       }
-      list.innerHTML = logs.map(l => `
-        <div class="history-item">
-          <strong>${l.title}</strong> — <span style="color:var(--muted);">${l.date}</span>
-          <div style="font-size:12px; color:var(--muted); margin-top:2px;">${l.details}</div>
+
+      appState.history.unshift({
+        id: 'hist-' + Date.now(),
+        date: dateStr,
+        title: `${prog.title}: ${day.name}`,
+        category: loggedCategory,
+        details: summary,
+        color: day.color || 'cyan'
+      });
+
+      saveState();
+      showToast(`${day.name} workout saved to History!`);
+      switchTab('history');
+    }
+
+    /* ========================================================================= */
+    /* 4. PROGRAM BUILDER & LIBRARY PICKER SYSTEM                                */
+    /* ========================================================================= */
+    let tempBuilderDays = [];
+    let activeDayTargetIndexForPicker = 0;
+    let currentPickerCategory = 'all';
+
+    function renderProgramsList() {
+      const container = document.getElementById('programsListContainer');
+      container.innerHTML = appState.programs.map(p => {
+        const isActive = p.id === appState.activeProgramId;
+        const badge = isActive 
+          ? `<span class="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold border border-emerald-500/30">ACTIVE</span>`
+          : `<button onclick="setActiveProgram('${p.id}')" class="text-xs font-bold text-cyan-400 hover:text-cyan-300 tap-press">Activate →</button>`;
+        
+        return `
+          <div class="glass-card rounded-3xl p-4 border ${isActive ? 'border-emerald-500/40' : 'border-white/10'} space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${p.days.length} Workout Days</span>
+              ${badge}
+            </div>
+            <h3 class="text-base font-black text-white">${p.title}</h3>
+            <p class="text-xs text-slate-400 line-clamp-2">${p.description}</p>
+            <div class="flex items-center justify-between pt-2 border-t border-white/5 text-xs text-slate-300">
+              <span class="font-mono text-[11px] text-slate-400">${p.days.map(d => d.label || d.name.slice(0,3)).join(' • ')}</span>
+              ${!p.isDefault ? `<button onclick="deleteCustomProgram('${p.id}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold tap-press">Delete</button>` : '<span class="text-[10px] text-slate-400">Default Template</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setActiveProgram(progId) {
+      playAudioTone('check');
+      appState.activeProgramId = progId;
+      saveState();
+      initWorkoutView();
+      renderProgramsList();
+      closeProgramSwitcherModal();
+      showToast('Switched active program!');
+    }
+
+    function deleteCustomProgram(progId) {
+      playAudioTone('click');
+      if (appState.programs.length <= 1) return;
+      appState.programs = appState.programs.filter(p => p.id !== progId);
+      if (appState.activeProgramId === progId) {
+        appState.activeProgramId = appState.programs[0].id;
+      }
+      saveState();
+      renderProgramsList();
+      initWorkoutView();
+      showToast('Program removed.');
+    }
+
+    function clonePreset(presetType) {
+      playAudioTone('check');
+      let cloned = null;
+      if (presetType === 'upper-lower-cindy') {
+        cloned = {
+          id: 'prog-' + Date.now(),
+          title: 'Upper/Lower Cindy Split',
+          description: '4-day split emphasizing upper body pressing, lower body squats & deadlifts, followed by Friday Cindy AMRAP.',
+          days: [
+            { id: 'ul-1', name: 'Upper Body A', label: 'Mon', dayOfWeek: 1, title: 'Upper Hypertrophy & Pull-Ups', category: 'strength', color: 'cyan', exercises: [appState.library[0], appState.library[6], appState.library[3]] },
+            { id: 'ul-2', name: 'Lower Body A', label: 'Tue', dayOfWeek: 2, title: 'Squat & Posterior Chain', category: 'strength', color: 'gold', exercises: [appState.library[11], appState.library[2]] },
+            { id: 'ul-3', name: 'Peloton Flush', label: 'Wed', dayOfWeek: 3, title: 'Active Cycling Conditioning', category: 'cardio', color: 'coral', exercises: [appState.library[17]] },
+            { id: 'ul-4', name: 'Cindy AMRAP', label: 'Fri', dayOfWeek: 5, title: 'Cindy 20-Min AMRAP', category: 'wod', color: 'emerald', isCindyBenchmark: true, exercises: [appState.library[21]] }
+          ]
+        };
+      } else {
+        cloned = {
+          id: 'prog-' + Date.now(),
+          title: 'Strict Pull-Up Mastery Lab',
+          description: '3-day laser focus on building strict pull-up volume and upper back thickness.',
+          days: [
+            { id: 'pl-1', name: 'Volume Day', label: 'Mon', dayOfWeek: 1, title: 'Tempo Pull-Ups & Lat Rows', category: 'strength', color: 'cyan', exercises: [appState.library[0], appState.library[8], appState.library[3]] },
+            { id: 'pl-2', name: 'Scapular Stability', label: 'Wed', dayOfWeek: 3, title: 'Hanging Retractions & Grip', category: 'strength', color: 'gold', exercises: [appState.library[5], appState.library[10]] },
+            { id: 'pl-3', name: 'Cindy Benchmark', label: 'Fri', dayOfWeek: 5, title: 'Friday Cindy AMRAP Test', category: 'wod', color: 'emerald', isCindyBenchmark: true, exercises: [appState.library[21]] }
+          ]
+        };
+      }
+
+      appState.programs.push(cloned);
+      appState.activeProgramId = cloned.id;
+      saveState();
+      initWorkoutView();
+      renderProgramsList();
+      showToast(`Created & Activated ${cloned.title}!`);
+    }
+
+    // Modal Program Builder
+    function openCreateProgramModal() {
+      playAudioTone('click');
+      tempBuilderDays = [
+        { name: 'Day 1', label: 'D1', title: 'Strength Focus', category: 'strength', exercises: [appState.library[0], appState.library[2]] },
+        { name: 'Day 2', label: 'D2', title: 'Cardio / Peloton', category: 'cardio', exercises: [appState.library[17]] },
+        { name: 'Day 3', label: 'D3', title: 'Cindy AMRAP', category: 'wod', isCindyBenchmark: true, exercises: [appState.library[21]] }
+      ];
+      renderBuilderDays();
+      document.getElementById('createProgramModal').classList.remove('hidden');
+    }
+
+    function closeCreateProgramModal() {
+      playAudioTone('click');
+      document.getElementById('createProgramModal').classList.add('hidden');
+    }
+
+    function addNewBuilderDay() {
+      playAudioTone('click');
+      const num = tempBuilderDays.length + 1;
+      tempBuilderDays.push({
+        name: `Day ${num}`,
+        label: `D${num}`,
+        title: 'Training Session',
+        category: 'strength',
+        exercises: []
+      });
+      renderBuilderDays();
+    }
+
+    function removeBuilderDay(idx) {
+      playAudioTone('click');
+      tempBuilderDays.splice(idx, 1);
+      renderBuilderDays();
+    }
+
+    function renderBuilderDays() {
+      const container = document.getElementById('builderDaysList');
+      container.innerHTML = tempBuilderDays.map((d, dIdx) => `
+        <div class="glass-card rounded-2xl p-3.5 space-y-2.5 border border-white/10">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <input type="text" value="${d.name}" oninput="tempBuilderDays[${dIdx}].name = this.value" class="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-xs font-bold text-white w-20">
+              <input type="text" value="${d.title}" oninput="tempBuilderDays[${dIdx}].title = this.value" placeholder="Session Title" class="bg-black/50 border border-white/10 rounded-lg px-2 py-1 text-xs text-slate-200 flex-1">
+            </div>
+            <button onclick="removeBuilderDay(${dIdx})" class="text-rose-400 font-bold text-xs p-1">✕</button>
+          </div>
+
+          <!-- Exercises Selected for Day -->
+          <div class="space-y-1 pl-1">
+            ${d.exercises.map((ex, exIdx) => `
+              <div class="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-900/60 border border-white/5">
+                <span class="text-slate-200">${ex.name}</span>
+                <button onclick="removeExerciseFromDay(${dIdx}, ${exIdx})" class="text-slate-400 hover:text-rose-400 text-xs">✕</button>
+              </div>
+            `).join('')}
+          </div>
+
+          <button onclick="openExercisePickerForDay(${dIdx})" class="w-full py-1.5 rounded-xl bg-slate-800 text-cyan-300 font-bold text-xs border border-white/5 tap-press">
+            + Add Exercise to ${d.name}
+          </button>
         </div>
       `).join('');
     }
+
+    function removeExerciseFromDay(dayIdx, exIdx) {
+      playAudioTone('click');
+      tempBuilderDays[dayIdx].exercises.splice(exIdx, 1);
+      renderBuilderDays();
+    }
+
+    function openExercisePickerForDay(dayIdx) {
+      playAudioTone('click');
+      activeDayTargetIndexForPicker = dayIdx;
+      filterPickerCategory('all');
+      document.getElementById('exercisePickerModal').classList.remove('hidden');
+    }
+
+    function closeExercisePicker() {
+      playAudioTone('click');
+      document.getElementById('exercisePickerModal').classList.add('hidden');
+    }
+
+    function filterPickerCategory(cat) {
+      currentPickerCategory = cat;
+      document.querySelectorAll('.picker-cat-btn').forEach(b => {
+        b.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-slate-400 picker-cat-btn';
+      });
+      event.target.className = 'px-2.5 py-1 rounded-lg bg-white/10 text-white picker-cat-btn active';
+      renderFilteredExerciseList();
+    }
+
+    function renderFilteredExerciseList() {
+      const query = (document.getElementById('pickerSearch').value || '').toLowerCase();
+      const listContainer = document.getElementById('pickerItemsList');
+
+      const filtered = appState.library.filter(ex => {
+        const matchesCat = currentPickerCategory === 'all' || ex.category === currentPickerCategory;
+        const matchesQuery = ex.name.toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      });
+
+      if (!filtered.length) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No exercises found.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = filtered.map(ex => `
+        <div onclick="selectExerciseForDay('${ex.id}')" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/5 flex items-center justify-between cursor-pointer tap-press">
+          <div>
+            <span class="text-xs font-bold text-white">${ex.name}</span>
+            <span class="text-[10px] text-slate-400 block">${ex.notes || ex.category}</span>
+          </div>
+          <span class="text-xs text-emerald-400 font-extrabold">+</span>
+        </div>
+      `).join('');
+    }
+
+    function selectExerciseForDay(exId) {
+      playAudioTone('check');
+      const item = appState.library.find(e => e.id === exId);
+      if (item && tempBuilderDays[activeDayTargetIndexForPicker]) {
+        tempBuilderDays[activeDayTargetIndexForPicker].exercises.push({ ...item });
+      }
+      closeExercisePicker();
+      renderBuilderDays();
+    }
+
+    function openAddCustomExerciseForm() {
+      playAudioTone('click');
+      document.getElementById('customExerciseFormModal').classList.remove('hidden');
+    }
+
+    function closeAddCustomExerciseForm() {
+      playAudioTone('click');
+      document.getElementById('customExerciseFormModal').classList.add('hidden');
+    }
+
+    function saveCustomExerciseToLibrary() {
+      playAudioTone('check');
+      const name = document.getElementById('custExName').value.trim();
+      const cat = document.getElementById('custExCategory').value;
+      if (!name) return;
+
+      const newEx = {
+        id: 'lib-' + Date.now(),
+        name,
+        category: cat,
+        notes: 'User custom exercise'
+      };
+
+      appState.library.push(newEx);
+      saveState();
+      closeAddCustomExerciseForm();
+      renderFilteredExerciseList();
+      showToast(`Added ${name} to exercise library!`);
+    }
+
+    function saveNewProgramFromBuilder() {
+      playAudioTone('fanfare');
+      const title = document.getElementById('newProgTitle').value.trim() || 'My Custom Program';
+      const desc = document.getElementById('newProgDesc').value.trim() || 'Personalized weekly split';
+
+      if (!tempBuilderDays.length) {
+        showToast('Please add at least one workout day.');
+        return;
+      }
+
+      const newProg = {
+        id: 'prog-' + Date.now(),
+        title,
+        description: desc,
+        days: tempBuilderDays.map((d, i) => ({
+          id: 'day-' + i,
+          name: d.name,
+          label: d.label || `D${i+1}`,
+          title: d.title,
+          category: d.category || 'strength',
+          color: d.category === 'cardio' ? 'coral' : (d.category === 'wod' ? 'emerald' : 'cyan'),
+          isCindyBenchmark: d.name.toLowerCase().includes('cindy') || d.title.toLowerCase().includes('cindy'),
+          exercises: d.exercises
+        }))
+      };
+
+      appState.programs.push(newProg);
+      appState.activeProgramId = newProg.id;
+      saveState();
+
+      closeCreateProgramModal();
+      initWorkoutView();
+      renderProgramsList();
+      switchTab('today');
+      showToast(`Activated ${newProg.title}!`);
+    }
+
+    function openProgramSwitcherModal() {
+      playAudioTone('click');
+      const list = document.getElementById('programsModalList');
+      list.innerHTML = appState.programs.map(p => {
+        const isActive = p.id === appState.activeProgramId;
+        return `
+          <div onclick="setActiveProgram('${p.id}')" class="p-3 rounded-2xl glass-card border ${isActive ? 'border-emerald-400 bg-emerald-950/20' : 'border-white/5'} cursor-pointer tap-press flex items-center justify-between">
+            <div>
+              <span class="text-xs font-black text-white">${p.title}</span>
+              <span class="text-[10px] text-slate-400 block">${p.days.length} Days • ${p.days.map(d=>d.label).join(', ')}</span>
+            </div>
+            ${isActive ? '<span class="text-xs font-black text-emerald-400">ACTIVE ✓</span>' : '<span class="text-xs text-slate-400">Select</span>'}
+          </div>
+        `;
+      }).join('');
+      document.getElementById('programSwitcherModal').classList.remove('hidden');
+    }
+
+    function closeProgramSwitcherModal() {
+      playAudioTone('click');
+      document.getElementById('programSwitcherModal').classList.add('hidden');
+    }
+
+    /* ========================================================================= */
+    /* 5. CINDY 20-MIN AMRAP ENGINE & PROJECTOR                                  */
+    /* ========================================================================= */
+    const CINDY_DURATION_SEC = 20 * 60;
+    let cindySeconds = CINDY_DURATION_SEC;
+    let cindyTimerId = null;
+    let cindyRunning = false;
+    let cindyRoundsCount = 0;
+    let cindyExtraReps = 0;
+
+    function updateCindyTimerView() {
+      const mins = Math.floor(cindySeconds / 60);
+      const secs = cindySeconds % 60;
+      document.getElementById('cindyTimerDigits').innerText = 
+        `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      // Dial stroke (552.92 circumference)
+      const circumference = 552.92;
+      const progress = cindySeconds / CINDY_DURATION_SEC;
+      const offset = circumference * (1 - progress);
+      document.getElementById('cindyDialCircle').style.strokeDashoffset = offset;
+
+      // Real-time Pace Projection
+      const elapsed = CINDY_DURATION_SEC - cindySeconds;
+      if (elapsed > 10 && cindyRoundsCount > 0) {
+        const totalCompletedRounds = cindyRoundsCount + (cindyExtraReps / 30);
+        const secPerRound = elapsed / totalCompletedRounds;
+        const pM = Math.floor(secPerRound / 60);
+        const pS = Math.floor(secPerRound % 60);
+        document.getElementById('cindyPaceMetric').innerText = `${pM}:${String(pS).padStart(2, '0')} / rnd`;
+
+        const projected = (CINDY_DURATION_SEC / secPerRound).toFixed(1);
+        document.getElementById('cindyProjectedScore').innerText = `${projected} rnds`;
+      }
+    }
+
+    function toggleCindyTimer() {
+      initAudio();
+      if (!cindyRunning) {
+        playAudioTone('beep');
+        cindyRunning = true;
+        document.getElementById('cindyStatusLabel').innerText = 'WORK ACTIVE';
+        document.getElementById('cindyPlayText').innerText = 'Pause';
+        document.getElementById('cindyPlayIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+
+        cindyTimerId = setInterval(() => {
+          if (cindySeconds > 0) {
+            cindySeconds--;
+            updateCindyTimerView();
+
+            if (cindySeconds === 600) { // 10 min
+              playAudioTone('beep');
+              showToast('⏱ 10:00 HALFWAY! Keep strict form on the pull-ups.');
+            } else if (cindySeconds === 60) { // 1 min left
+              playAudioTone('beep');
+              showToast('🔥 1 MINUTE REMAINING! Sprint squats!');
+            } else if (cindySeconds <= 5 && cindySeconds > 0) {
+              playAudioTone('beep');
+            } else if (cindySeconds === 0) {
+              clearInterval(cindyTimerId);
+              cindyRunning = false;
+              playAudioTone('fanfare');
+              document.getElementById('cindyStatusLabel').innerText = 'TIME EXPIRED!';
+              showToast('🏆 TIME! Excellent Cindy AMRAP performance.');
+            }
+          }
+        }, 1000);
+      } else {
+        playAudioTone('click');
+        clearInterval(cindyTimerId);
+        cindyRunning = false;
+        document.getElementById('cindyStatusLabel').innerText = 'PAUSED';
+        document.getElementById('cindyPlayText').innerText = 'Resume';
+        document.getElementById('cindyPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+      }
+    }
+
+    function resetCindyTimer() {
+      playAudioTone('click');
+      clearInterval(cindyTimerId);
+      cindyRunning = false;
+      cindySeconds = CINDY_DURATION_SEC;
+      updateCindyTimerView();
+      document.getElementById('cindyStatusLabel').innerText = 'READY';
+      document.getElementById('cindyPlayText').innerText = 'Start Cindy';
+      document.getElementById('cindyPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    }
+
+    function incrementCindyRound(d) {
+      playAudioTone('click');
+      cindyRoundsCount = Math.max(0, cindyRoundsCount + d);
+      document.getElementById('cindyRoundsBig').innerText = cindyRoundsCount;
+      updateCindyTimerView();
+    }
+
+    function addCindyPartialReps(reps) {
+      playAudioTone('check');
+      cindyExtraReps += reps;
+      if (cindyExtraReps >= 30) {
+        cindyRoundsCount += Math.floor(cindyExtraReps / 30);
+        cindyExtraReps = cindyExtraReps % 30;
+        document.getElementById('cindyRoundsBig').innerText = cindyRoundsCount;
+      }
+      document.getElementById('cindyPartialDisplay').innerText = cindyExtraReps;
+      updateCindyTimerView();
+    }
+
+    function saveCindySession() {
+      playAudioTone('fanfare');
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const totalScore = parseFloat((cindyRoundsCount + (cindyExtraReps / 30)).toFixed(1));
+
+      const entry = {
+        id: 'hist-' + Date.now(),
+        date: dateStr,
+        title: 'Cindy 20-Min AMRAP',
+        category: 'wod',
+        details: `${cindyRoundsCount} Rounds + ${cindyExtraReps} Reps (Total: ${totalScore} rounds / ${(cindyRoundsCount * 30) + cindyExtraReps} reps)`,
+        color: 'emerald'
+      };
+
+      appState.cindyLogs.push({
+        date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        rounds: totalScore
+      });
+
+      if (totalScore > appState.prs.cindy) {
+        appState.prs.cindy = totalScore;
+        showToast(`🎉 NEW ALL-TIME CINDY PR: ${totalScore} ROUNDS!`);
+      } else {
+        showToast(`Cindy session recorded: ${totalScore} rounds!`);
+      }
+
+      appState.history.unshift(entry);
+      saveState();
+
+      resetCindyTimer();
+      cindyRoundsCount = 0;
+      cindyExtraReps = 0;
+      document.getElementById('cindyRoundsBig').innerText = 0;
+      document.getElementById('cindyPartialDisplay').innerText = 0;
+      switchTab('history');
+    }
+
+    /* ========================================================================= */
+    /* 6. FLOATING REST TIMER CONTROLLER                                         */
+    /* ========================================================================= */
+    let restTimerInterval = null;
+    let restSecRemaining = 0;
+
+    function startRestTimer(seconds) {
+      clearInterval(restTimerInterval);
+      restSecRemaining = seconds;
+      document.getElementById('floatingRestBar').classList.remove('hidden');
+      updateRestDisplay();
+
+      restTimerInterval = setInterval(() => {
+        if (restSecRemaining > 0) {
+          restSecRemaining--;
+          updateRestDisplay();
+          if (restSecRemaining <= 3 && restSecRemaining > 0) {
+            playAudioTone('beep');
+          } else if (restSecRemaining === 0) {
+            playAudioTone('fanfare');
+            stopRestTimer();
+            showToast('⏰ Rest period complete! Ready for next set.');
+          }
+        }
+      }, 1000);
+    }
+
+    function updateRestDisplay() {
+      const m = Math.floor(restSecRemaining / 60);
+      const s = restSecRemaining % 60;
+      document.getElementById('restTimerDisplay').innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function adjustRestTimer(delta) {
+      playAudioTone('click');
+      restSecRemaining += delta;
+      updateRestDisplay();
+    }
+
+    function stopRestTimer() {
+      clearInterval(restTimerInterval);
+      document.getElementById('floatingRestBar').classList.add('hidden');
+    }
+
+    /* ========================================================================= */
+    /* 7. PROGRESSION TELEMETRY & CANVAS CHARTS                                  */
+    /* ========================================================================= */
+    function renderAnalyticsView() {
+      document.getElementById('badgePullUps').innerText = `${appState.pullUpMax} Reps`;
+      document.getElementById('badgeCindy').innerText = `${appState.prs.cindy} Rnds`;
+      document.getElementById('badgePeloton').innerText = `${appState.prs.peloton} kJ`;
+      document.getElementById('badgeRdl').innerText = `${appState.prs.rdl} lbs`;
+      document.getElementById('cindyPrTag').innerText = `PR: ${appState.prs.cindy} Rnds`;
+      document.getElementById('pullUpPrTag').innerText = `Max: ${appState.pullUpMax} Reps`;
+
+      drawTrendGraph('cindyTrendCanvas', appState.cindyLogs.map(l => ({ label: l.date, val: l.rounds })), '#00f5a0');
+      drawTrendGraph('pullUpTrendCanvas', appState.pullUpLogs.map(l => ({ label: l.date, val: l.reps })), '#00d2ff');
+    }
+
+    function drawTrendGraph(canvasId, points, strokeHex) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const padL = 36;
+      const padR = 18;
+      const padT = 18;
+      const padB = 28;
+
+      ctx.clearRect(0, 0, w, h);
+      if (points.length < 2) return;
+
+      const vals = points.map(p => p.val);
+      const minVal = Math.floor(Math.min(...vals) * 0.85);
+      const maxVal = Math.ceil(Math.max(...vals) * 1.15);
+
+      const getX = (i) => padL + (i / (points.length - 1)) * (w - padL - padR);
+      const getY = (v) => h - padB - ((v - minVal) / (maxVal - minVal)) * (h - padT - padB);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+      for (let s = 0; s <= 3; s++) {
+        const val = minVal + (s / 3) * (maxVal - minVal);
+        const y = getY(val);
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(w - padR, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '9px -apple-system, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText(val.toFixed(0), padL - 6, y + 3);
+      }
+
+      // Gradient area
+      const grad = ctx.createLinearGradient(0, padT, 0, h - padB);
+      grad.addColorStop(0, strokeHex + '40');
+      grad.addColorStop(1, strokeHex + '00');
+
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(points[0].val));
+      for (let i = 1; i < points.length; i++) {
+        ctx.lineTo(getX(i), getY(points[i].val));
+      }
+      ctx.lineTo(getX(points.length - 1), h - padB);
+      ctx.lineTo(getX(0), h - padB);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Trend Line
+      ctx.beginPath();
+      ctx.strokeStyle = strokeHex;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (let i = 0; i < points.length; i++) {
+        const x = getX(i);
+        const y = getY(points[i].val);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Points
+      points.forEach((p, i) => {
+        const x = getX(i);
+        const y = getY(p.val);
+
+        ctx.fillStyle = '#07090e';
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = strokeHex;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '9px -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.label, x, h - 8);
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 9px -apple-system, sans-serif';
+        ctx.fillText(`${p.val}`, x, y - 8);
+      });
+    }
+
+    /* ========================================================================= */
+    /* 8. HISTORY FEED, DATA BACKUP & NAVIGATION                                 */
+    /* ========================================================================= */
+    function renderHistoryList() {
+      const container = document.getElementById('historyFeedList');
+      if (!appState.history.length) {
+        container.innerHTML = `<div class="glass-card rounded-2xl p-6 text-center text-slate-400 text-xs">No workouts logged yet. Complete a session!</div>`;
+        return;
+      }
+
+      container.innerHTML = appState.history.map((h, i) => {
+        const badgeColor = h.color === 'emerald' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' :
+                           h.color === 'coral' ? 'bg-rose-500/20 text-rose-300 border-rose-500/30' :
+                           h.color === 'gold' ? 'bg-amber-500/20 text-amber-300 border-amber-500/30' :
+                           'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+
+        return `
+          <div class="glass-card rounded-2xl p-3.5 space-y-2 border border-white/5">
+            <div class="flex items-center justify-between">
+              <span class="text-[9px] font-black px-2 py-0.5 rounded ${badgeColor} border uppercase tracking-wide">
+                ${h.category}
+              </span>
+              <div class="flex items-center space-x-2">
+                <span class="text-[11px] font-medium text-slate-400 font-mono">${h.date}</span>
+                <button onclick="deleteHistoryEntry(${i})" class="text-slate-500 hover:text-rose-400 text-xs">✕</button>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white">${h.title}</h4>
+              <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">${h.details}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function deleteHistoryEntry(index) {
+      playAudioTone('click');
+      appState.history.splice(index, 1);
+      saveState();
+      renderHistoryList();
+      showToast('Log removed.');
+    }
+
+    function switchTab(target) {
+      playAudioTone('click');
+      const tabs = ['today', 'programs', 'cindy', 'analytics', 'history'];
+      tabs.forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-nav-${t}`);
+        if (t === target) {
+          view.classList.remove('hidden');
+          if (t !== 'cindy') {
+            btn.classList.add('text-cyan-400');
+            btn.classList.remove('text-slate-400');
+          }
+        } else {
+          view.classList.add('hidden');
+          if (t !== 'cindy') {
+            btn.classList.remove('text-cyan-400');
+            btn.classList.add('text-slate-400');
+          }
+        }
+      });
+
+      if (target === 'programs') renderProgramsList();
+      if (target === 'analytics') renderAnalyticsView();
+      if (target === 'history') renderHistoryList();
+      if (target === 'today') initWorkoutView();
+    }
+
+    function showToast(msg) {
+      const bar = document.getElementById('appToast');
+      const content = document.getElementById('toastContent');
+      content.innerText = msg;
+      bar.classList.remove('opacity-0', '-translate-y-4');
+      bar.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        bar.classList.remove('opacity-100', 'translate-y-0');
+        bar.classList.add('opacity-0', '-translate-y-4');
+      }, 2400);
+    }
+
+    function openStrategyModal() {
+      playAudioTone('click');
+      document.getElementById('strategyModal').classList.remove('hidden');
+    }
+    function closeStrategyModal() {
+      playAudioTone('click');
+      document.getElementById('strategyModal').classList.add('hidden');
+    }
+
+    function openBackupModal() {
+      playAudioTone('click');
+      document.getElementById('backupModal').classList.remove('hidden');
+    }
+    function closeBackupModal() {
+      playAudioTone('click');
+      document.getElementById('backupModal').classList.add('hidden');
+    }
+
+    function exportJSONBackup() {
+      const json = JSON.stringify(appState, null, 2);
+      const el = document.createElement("textarea");
+      el.value = json;
+      document.body.appendChild(el);
+      el.select();
+      try {
+        document.execCommand('copy');
+        showToast('✓ Backup JSON copied to clipboard!');
+      } catch (err) {
+        showToast('Check console for exported JSON.');
+      }
+      document.body.removeChild(el);
+    }
+
+    function importJSONBackup() {
+      const text = document.getElementById('importJsonBox').value.trim();
+      if (!text) return;
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed.programs && parsed.activeProgramId) {
+          appState = parsed;
+          saveState();
+          initWorkoutView();
+          renderProgramsList();
+          closeBackupModal();
+          showToast('✓ Training data imported successfully!');
+        }
+      } catch (err) {
+        showToast('Invalid JSON format.');
+      }
+    }
+
+    function confirmResetAllData() {
+      appState = JSON.parse(JSON.stringify(INITIAL_STATE));
+      saveState();
+      initWorkoutView();
+      renderHistoryList();
+      showToast('All training records restored to default.');
+    }
+
+    window.onload = function() {
+      initWorkoutView();
+      renderProgramsList();
+      renderHistoryList();
+      updateCindyTimerView();
+
+      window.addEventListener('resize', () => {
+        if (!document.getElementById('view-analytics').classList.contains('hidden')) {
+          renderAnalyticsView();
+        }
+      });
+    };
   </script>
 </body>
 </html>
